@@ -5,7 +5,7 @@ from torch.autograd import Variable
 from collections import OrderedDict
 
 
-def summary(model, input_size, device="cuda"):
+def summary(model, input_size, device="cuda", unpack_inputs=False):
         def register_hook(module):
             def hook(module, input, output):
                 class_name = str(module.__class__).split('.')[-1].split("'")[0]
@@ -57,7 +57,10 @@ def summary(model, input_size, device="cuda"):
         model.apply(register_hook)
         # make a forward pass
         # print(x.shape)
-        model(x)
+        if unpack_inputs and isinstance(input_size[0], (list, tuple)):
+            model(*x)
+        else:
+            model(x)
         # remove these hooks
         for h in hooks:
             h.remove()
